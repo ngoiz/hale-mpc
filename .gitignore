@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# SHARPy files
+.h5
+cases/
+output/
+.vtu
+
