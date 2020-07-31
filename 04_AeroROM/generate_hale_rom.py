@@ -884,7 +884,7 @@ def generate_solver_file():
                                                          'remove_dofs': []},
                                        'aero_settings': {'dt': dt,
                                                          'ScalingDict': {'density': rho,
-                                                                         'length': chord_main / 0.5,
+                                                                         'length': chord_main * 0.5,
                                                                          'speed': u_inf},
                                                          'integr_order': 2,
                                                          'density': rho,
