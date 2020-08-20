@@ -4,7 +4,7 @@ import numpy as np
 import os
 import sharpy.utils.algebra as algebra
 
-case_name = 'simple_HALE'
+case_name = 'simple_HALE_c4force_inertial'
 route = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 # case files folder
@@ -258,16 +258,32 @@ def generate_dyn_file():
         with_forced_vel = True
 
     if with_dynamic_forces:
-        f1 = 50 * 9.81 /15
+        from force_activation import generate_force_array
+        new_mass = 30
+        f1 = new_mass * 9.81
         dynamic_forces = np.zeros((num_node, 6))
-        app_node = [0]
-        dynamic_forces[app_node, 2] = f1
+        app_node = 0
+        # dynamic_forces[app_node, 2] = f1
         force_time = np.zeros((n_tstep, ))
         force_time[5:] = 1
 
         dynamic_forces_time = np.zeros((n_tstep, num_node, 6))
-        for it in range(n_tstep):
-            dynamic_forces_time[it, :, :] = force_time[it]*dynamic_forces
+        # for it in range(n_tstep):
+        #     dynamic_forces_time[it, :, :] = force_time[it]*dynamic_forces
+        t_init = 5 * dt
+        nt_force_app = 20
+        time_out, y_out = generate_force_array(n_tstep, dt, 0.99, f1, t_init, t_init + nt_force_app * dt)
+        dynamic_forces_time[:, app_node, 2] = y_out
+        # for it in range(n_tstep):
+        #     dynamic_forces_time[it, :, :] =
+        external_mass = np.zeros((n_tstep, num_node, ))
+        external_mass[:, app_node] = generate_force_array(n_tstep, dt, 0.99, -new_mass, t_init,
+                                                          t_init + nt_force_app * dt)[1]
+
+        # import matplotlib.pyplot as plt
+        # plt.plot(time_out[:20], y_out[:20])
+        # plt.show()
+
 
     forced_for_vel = None
     if with_forced_vel:
@@ -289,6 +305,8 @@ def generate_dyn_file():
             if with_dynamic_forces:
                 h5file.create_dataset(
                     'dynamic_gfor_forces', data=dynamic_forces_time)
+                h5file.create_dataset(
+                    'external_mass', data=external_mass)
             if with_forced_vel:
                 h5file.create_dataset(
                     'for_vel', data=forced_for_vel)
@@ -773,7 +791,8 @@ def generate_solver_file():
                                   'structural_solver_settings': settings[solver],
                                   'aero_solver': 'StepUvlm',
                                   'aero_solver_settings': settings['StepUvlm'],
-                                  'fsi_substeps': 25,
+                                  # 'fsi_substeps': 250,
+                                  'fsi_substeps': 1000,
                                   'fsi_tolerance': fsi_tolerance,
                                   'relaxation_factor': relaxation_factor,
                                   'minimum_steps': 1,
@@ -782,7 +801,7 @@ def generate_solver_file():
                                   'n_time_steps': n_tstep,
                                   'dt': dt,
                                   'include_unsteady_force_contribution': 'on',
-                                  'pseudosteps_ramp_unsteady_force': 20,
+                                  'pseudosteps_ramp_unsteady_force': 5,
                                   'steps_without_unsteady_force': 5,
                                   'postprocessors': ['BeamPlot', 'AerogridPlot'],
                                   'postprocessors_settings': {'BeamLoads': {'folder': route + '/output/',
