@@ -1,32 +1,34 @@
 #! /usr/bin/env python3
 import h5py as h5
-import sharpy.sharpy_main
 import numpy as np
 import os
 import sharpy.utils.algebra as algebra
 
 # alpha_deg = 0
-for alpha_deg in [0, 1., 2., 3., 4.]:
-    case_name = 'simple_HALE_uvlm_alpha{:04g}'.format(alpha_deg * 100)
+for alpha_deg in np.linspace(0, 5, 11):
+    case_name = 'simple_HALE_aeroelastic_alpha{:04g}'.format(alpha_deg * 100)
 
     route = os.path.dirname(os.path.realpath(__file__)) + '/'
+
 
     # EXECUTION
     flow = ['BeamLoader',
             'AerogridLoader',
             # 'NonLinearStatic',
-            'StaticUvlm',
+            # 'StaticUvlm',
             # 'StaticTrim',
-            # 'StaticCoupled',
+            'StaticCoupled',
             # 'BeamLoads',
+            'AeroForcesCalculator',
             'AerogridPlot',
             'BeamPlot',
             # 'DynamicCoupled',
-            'Modal',
-            'LinearAssembler',
-            'AsymptoticStability',
-            'SaveData',
+            # 'Modal',
+            # 'LinearAssembler',
+            # 'AsymptoticStability',
+            # 'SaveData',
             # 'LinDynamicSim',
+            'SaveParametricCase'
             ]
 
     # if free_flight is False, the motion of the centre of the wing is prescribed.
@@ -38,18 +40,18 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
         case_name += '_amp_' + str(amplitude).replace('.', '') + '_period_' + str(period)
 
     lumped_mass_factor = 1
-    case_name += '_lm{:g}'.format(lumped_mass_factor)
+    # case_name += '_lm{:g}'.format(lumped_mass_factor)
 
     ## ROM
     rom = True
     # linear settings
     num_modes = 20
-    case_name += '_rom{:g}_nmodes{:g}'.format(rom, num_modes)
+    # case_name += '_rom{:g}_nmodes{:g}'.format(rom, num_modes)
 
     # FLIGHT CONDITIONS
     # the simulation is set such that the aircraft flies at a u_inf velocity while
     # the air is calm.
-    u_inf = 1
+    u_inf = 10
     rho = 1.225
 
     # trim sigma = 1.5
@@ -862,6 +864,10 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
                                     'u_inf': u_inf,
                                     'dt': dt}
 
+        settings['AeroForcesCalculator'] = {'folder': route + '/output/',
+                                            'write_text_file': 'on',
+                                            'screen_output': 'on'}
+
         settings['Modal'] = {'print_info': 'on',
                              'use_undamped_modes': 'on',
                              'NumLambda': num_modes,
@@ -936,6 +942,9 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
                                                            'minus_m_star': 0}, }
                                      }
 
+        settings['SaveParametricCase'] = {'folder': route + '/output/' + case_name + '/',
+                                      'save_case': 'off',
+                                      'parameters': {'alpha': alpha_deg}}
 
         import configobj
         config = configobj.ConfigObj()
@@ -953,4 +962,5 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
     generate_dyn_file()
     generate_linear_sim_files(x0, input_vec)
 
-    sharpy.sharpy_main.main(['', cases_folder + '/' + case_name + '.sharpy'])
+    import sharpy.sharpy_main
+    sharpy.sharpy_main.main(['', cases_folder + case_name + '.sharpy'])
