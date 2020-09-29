@@ -6,8 +6,9 @@ import os
 import sharpy.utils.algebra as algebra
 
 # alpha_deg = 0
-for alpha_deg in [0, 1., 2., 3., 4.]:
-    case_name = 'simple_HALE_uvlm_alpha{:04g}'.format(alpha_deg * 100)
+# for alpha_deg in [0, 1., 2., 3., 4.][::-1]:
+for alpha_deg in [4.1514, 5.0, 4., 3. , 2. , 1., 0.]:
+    case_name = 'simple_HALE_nuvlm_tb_alpha{:04g}'.format(alpha_deg * 100)
 
     route = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -19,12 +20,13 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
             # 'StaticTrim',
             # 'StaticCoupled',
             # 'BeamLoads',
+            'AeroForcesCalculator',
             'AerogridPlot',
             'BeamPlot',
             # 'DynamicCoupled',
             'Modal',
             'LinearAssembler',
-            'AsymptoticStability',
+            # 'AsymptoticStability',
             'SaveData',
             # 'LinDynamicSim',
             ]
@@ -57,7 +59,7 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
     beta = 0
     roll = 0
     gravity = 'on'
-    cs_deflection = 0 #-2.0249*np.pi/180
+    cs_deflection = 0*np.pi/180
     rudder_static_deflection = 0.0
     rudder_step = 0.0*np.pi/180
     thrust = 5.9443
@@ -298,8 +300,6 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
         if with_dynamic_forces:
             f1 = 100
             dynamic_forces = np.zeros((num_node, 6))
-            app_node = [int(num_node_main - 1), int(num_node_main)]
-            dynamic_forces[app_node, 2] = f1
             force_time = np.zeros((n_tstep, ))
             limit = round(0.05/dt)
             force_time[50:61] = 1
@@ -729,7 +729,11 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
         settings['AerogridLoader'] = {'unsteady': 'on',
                                       'aligned_grid': 'on',
                                       'mstar': m_star_factor * m,
-                                      'freestream_dir': ['1', '0', '0']}
+                                      'freestream_dir': ['1', '0', '0'],
+                                      'wake_shape_generator': 'StraightWake',
+                                      'wake_shape_generator_input': {'dt': dt,
+                                                                     'u_inf': u_inf,
+                                                                     'u_inf_direction': [1, 0, 0.]}}
 
         settings['NonLinearStatic'] = {'print_info': 'off',
                                        'max_iterations': 150,
@@ -854,6 +858,10 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
                                 'include_applied_forces': 'on',
                                 'include_forward_motion': 'on'}
 
+        settings['AeroForcesCalculator'] = {'folder': route + '/output/',
+                                            'write_text_file': 'on',
+                                            'screen_output': 'on'}
+
         settings['AerogridPlot'] = {'folder': route + '/output/',
                                     'include_rbm': 'on',
                                     'include_forward_motion': 'off',
@@ -873,6 +881,7 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
 
         settings['LinearAssembler'] = {'linear_system': 'LinearAeroelastic',
                                        'linear_system_settings': {
+                                           'track_body': 'on',
                                            'beam_settings': {'modal_projection': 'on',
                                                              'inout_coords': 'modes',
                                                              'discrete_time': 'on',
@@ -916,6 +925,12 @@ for alpha_deg in [0, 1., 2., 3., 4.]:
                                            'export_eigenvalues': 'off',
                                            'num_evals': 40,
                                            'folder': route + '/output/'}
+
+        settings['FrequencyResponse'] = {'folder': route + '/output/',
+                                         'target_system': ['aerodynamic'],
+                                         'frequency_spacing': 'linear',
+                                         'frequency_bounds': [0, 1],
+                                         'num_freqs': 1}
 
         settings['SaveData'] = {'folder': route + '/output/' + case_name + '/',
                                 'save_aero': 'off',
