@@ -4,7 +4,7 @@ import numpy as np
 import os
 import sharpy.utils.algebra as algebra
 
-case_name = 'simple_HALE_uvlm_alpha0400'
+case_name = 'simple_HALE_uvlm_alpha0200'
 route = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
@@ -56,7 +56,7 @@ u_inf = 10
 rho = 1.225
 
 # trim sigma = 1.5
-alpha = 4 * np.pi/180
+alpha = 2 * np.pi/180
 beta = 0
 roll = 0
 gravity = 'on'
