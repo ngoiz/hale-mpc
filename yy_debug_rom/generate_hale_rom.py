@@ -4,7 +4,7 @@ import numpy as np
 import os
 import sharpy.utils.algebra as algebra
 
-case_name = 'simple_HALE_uvlm_alpha0200'
+case_name = 'simple_HALE_uvlm_alpha0200_scaled'
 route = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
@@ -52,7 +52,7 @@ if modal:
 # FLIGHT CONDITIONS
 # the simulation is set such that the aircraft flies at a u_inf velocity while
 # the air is calm.
-u_inf = 10
+u_inf = 1
 rho = 1.225
 
 # trim sigma = 1.5
@@ -896,9 +896,9 @@ def generate_solver_file():
                                                          'gravity': 'on',
                                                          'remove_dofs': []},
                                        'aero_settings': {'dt': dt,
-                                                         # 'ScalingDict': {'density': rho,
-                                                         #                 'length': chord_main * 0.5,
-                                                         #                 'speed': u_inf},
+                                                         'ScalingDict': {'density': rho,
+                                                                         'length': chord_main * 0.5,
+                                                                         'speed': u_inf},
                                                          'integr_order': 2,
                                                          'density': rho,
                                                          'remove_predictor': 'off',
