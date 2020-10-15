@@ -6,7 +6,8 @@ from batch.sets import Actual
 
 ### INPUTS
 sharpy_output_folder = './output/'
-case_name_pattern = 'simple_HALE_aeroelastic'
+case_name_pattern = 'simple_HALE_uvlm_uinf*_alpha0200'
+out_name = 'simple_HALE_uvlm_alpha0200_u_inf'
 output_path = './results/'
 ###
 
@@ -26,6 +27,6 @@ forces = np.zeros((len(alpha), 3))
 for ii, idx in enumerate(order):
     forces[ii] = forces_list[idx][1:4]
 
-np.savetxt(output_path + '/' + case_name_pattern + '.txt',
+np.savetxt(output_path + '/' + out_name + '.txt',
            np.column_stack((alpha, forces)))
 
