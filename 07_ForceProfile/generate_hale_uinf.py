@@ -6,8 +6,8 @@ import sharpy.utils.algebra as algebra
 
 # alpha_deg = 0
 for u_inf in np.linspace(5, 15, 11):
-    case_name = 'simple_HALE_uvlm_uinf{:04g}_alpha0200'.format(u_inf * 10)
-    alpha_deg = 2
+    alpha_deg = 4
+    case_name = 'simple_HALE_uvlm_uinf{:04g}_alpha{:04g}'.format(u_inf * 10, alpha_deg * 100)
     route = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 

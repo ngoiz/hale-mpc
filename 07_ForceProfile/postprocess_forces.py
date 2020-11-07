@@ -6,8 +6,8 @@ from batch.sets import Actual
 
 ### INPUTS
 sharpy_output_folder = './output/'
-case_name_pattern = 'simple_HALE_uvlm_uinf*_alpha0200'
-out_name = 'simple_HALE_uvlm_alpha0200_u_inf'
+case_name_pattern = 'simple_HALE_uvlm_uinf*_alpha0400'
+out_name = 'simple_HALE_uvlm_alpha0400_u_inf'
 output_path = './results/'
 ###
 
